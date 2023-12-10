@@ -8,18 +8,17 @@ from notes.models import Note
 
 User = get_user_model()
 
+
 class TestRoutes(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.note = Note.objects.create(title='Заголовок', text='Текст')
+        cls.note = Note.objects.create(title='Заголовок', text='Текст',)
         cls.author = User.objects.create(username='Автор заметки')
         cls.reader = User.objects.create(username='Читатель заметки')
-
-
-    """Testing availability of the main page for authonificated
+    """Testing: availability of the main page for authonificated
     and non-authonificated users;
-    testing of list of the notes, adding note and successful adding a new note
+    testing: list of the notes, adding note and successful adding a new note
     are available for authonificated users.
     """
     def test_pages_availability(self):
@@ -36,7 +35,7 @@ class TestRoutes(TestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    """Testing of availability of a note editing and deletion
+    """Testing: availability of a note editing and deletion
     for its author only.
     """
     def test_availability_for_comment_edit_and_delete(self):
