@@ -10,7 +10,7 @@ from news.models import News, Comment
 COMMENT_TEXT = 'Текст комментария.'
 COMMENT_TEXT_NEW = 'Новый текст комментария.'
 
-
+@pytest.mark.django_db
 def test_home_availability_for_anonymous_user(client):
     """Тестирование, пункт 1: главная страница
     доступна анонимному пользователю.
