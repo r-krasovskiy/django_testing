@@ -1,76 +1,60 @@
-from http import HTTPStatus
-
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
 from notes.models import Note
+from notes.forms import NoteForm
 
 User = get_user_model()
 
-"""Testing: a separate note is transferred to the
-page with notes list in the 'object_list' of the 'content'.
-"""
-
 
 class TestContent(TestCase):
-    """Тестирование: на страницы создания
-    и редактирования заметки передаются формы.
-    """
 
     @classmethod
     def setUpTestData(cls):
-        cls.author = User.objects.create(username='Автор заметки')
-        cls.create = Note.objects.create(
-            title='Заголовок',
-            text='Текст',
-            slug='my-slug',
-            author=cls.author,
+        cls.reader = User.objects.create(username='Читатель')
+        cls.author = User.objects.create(username='Автор')
+        cls.auth_reader = Client()
+        cls.auth_author = Client()
+        cls.auth_reader.force_login(cls.reader)
+        cls.auth_author.force_login(cls.author)
+        cls.note = Note.objects.create(
+            title='Заголовок заметки',
+            text='Текст заметки',
+            slug='note_slug',
+            author=cls.author
         )
 
-    def test_note_in_list_of_different_users():
-        """Тестирование: в список заметок одного пользователя
-        не попадают заметки другого пользователя.
+    def test_note_in_object_list(self):
+        """Тест, пункт 1, 2:
+        - отдельная заметка передаётся на страницу
+        со списком заметок в списке object_list в словаре context;
+        - в список заметок одного пользователя не попадают заметки
+        другого пользователя.
         """
-        user_statuses = (
-            (self.author, True),
-            (self.reader, False),
+        users_availability = (
+            (self.auth_author, True),
+            (self.auth_reader, False),
         )
-        for user, status in user_statuses:
-            self.client.force_login(user)
-            with self.subTest(user=user):
-                url = reverse('notes:list')
-                response = self.client.get('url')
-                object_list = response.context['object_list']
-                self.assertIs((self.note in object_list), status)
+        for user, result in users_availability:
+            with self.subTest(user=user, result=result):
+                response = user.get(reverse('notes:list'))
+                object_context = response.context['object_list']
+                self.assertIs((self.note in object_context), result)
 
-    def test_anonymous_client_has_no_form(self):
+    def test_creation_and_edition_forms(self):
+        """Тест, пункт 3: на страницы создания и редактирования
+        заметки передаются формы.
+        """
         urls = (
-            ('notes:edit'),
-            ('notes:add'),
+            ('notes:add', None),
+            ('notes:edit', (self.note.slug,)),
         )
-        for name in urls:
-            with self.subTest(name=name):
-                if name == 'notes:add':
-                    url = reverse(name)
-                else:
-                    url = reverse(name, args=(self.note.slug,))
-                response = self.client.get(url)
-                self.assertNotIn('form', response.context)
-
-    def test_authorized_client_has_form(self):
-        user = self.author
-        self.client.force_login(user)
-        urls = (
-            ('notes:edit'),
-            ('notes:add'),
-        )
-        for name in urls:
-            with self.subtest(name=name):
-                if name == 'notes:add':
-                    url = reverse(name)
-                else:
-                    url = reverse(name, args=(self.note.slug,))
-        response = self.client.get(url)
-        self.assertIn('form', response.context)
+        for url, args in urls:
+            with self.subTest(url=url):
+                response = self.auth_author.get(reverse(url, args=args))
+                self.assertIn('form', response.context)
+                self.assertIsInstance(
+                    response.context['form'],
+                    NoteForm,
+                    msg=None)

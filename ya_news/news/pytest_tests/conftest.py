@@ -96,3 +96,10 @@ def updated_comment(author, news):
         author=author,
     )
     return comment
+
+
+@pytest.fixture
+def form_data():
+    return {
+        'text': 'Новый текст',
+    } 
