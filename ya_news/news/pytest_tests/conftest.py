@@ -79,3 +79,20 @@ def all_comments(news, author):
         )
         comment.created = timezone.now() + timedelta(days=index)
         comment.save()
+
+
+@pytest.fixture
+def id_for_args(comment):
+    """Фикстура с id комментариев"""
+    return comment.id,
+
+
+@pytest.fixture
+def updated_comment(author, news):
+    """Фикстура редактирования комментария к новости."""
+    comment = Comment.objects.create(
+        news=news,
+        text='Скорректированный текст комментария',
+        author=author,
+    )
+    return comment

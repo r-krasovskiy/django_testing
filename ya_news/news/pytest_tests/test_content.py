@@ -53,13 +53,13 @@ def test_comments_order_from_newest_to_oldest(news, client):
 """Тестирование, пункт 4: анонимному пользователю недоступна форма для отправки
     комментария на странице отдельной новости, а авторизованному доступна."""
 @pytest.mark.parametrize(
-    'name, args',
+    'parametrized_client, form',
     (
-        ('news: detail', None),
-        ('news:edit', pytest.lazy_fixture('comment'))
+        (pytest.lazy_fixture('author_client'), True),
+        (pytest.lazy_fixture('client'), False),
     )
 )
-def test_form_availability_for_different_users(author_client, name, args):
-    url = reverse(name, args=args),
-    response = author_client.get(url)
-    assert 'form' in response.context
+def test_edit_comment_page_contains_form(id_for_args, parametrized_client, form):
+    url = reverse('news:detail', args=id_for_args)
+    response = parametrized_client.get(url)
+    assert form in response.context
