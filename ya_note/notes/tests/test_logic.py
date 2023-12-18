@@ -15,6 +15,13 @@ class TestNoteCreation(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        """Подготовка фикстур для тестов.
+
+        Args:
+         reader: залогиненный юзер, читатель чужих заметок.
+         author: залогиненный юзер, автор заметок.
+         note: заметка.
+        """
         cls.reader = User.objects.create(username='Читатель')
         cls.author = User.objects.create(username='Автор')
         cls.auth_reader = Client()
@@ -24,7 +31,7 @@ class TestNoteCreation(TestCase):
         cls.note = Note.objects.create(
             title='Заголовок заметки',
             text='Текст заметки',
-            slug='note_slug',
+            slug='note-slug',
             author=cls.author
         )
         cls.form_data = {
