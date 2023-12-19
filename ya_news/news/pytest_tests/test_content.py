@@ -6,12 +6,11 @@ from yanews import settings
 
 
 @pytest.mark.django_db
-def test_news_on_main_page_count(all_news, client):
-    """Тестирование, пункт 1: количество новостей
+def test_news_count(client, urls_news_home):
+    """Тест, пункт 1: количество новостей
     на главной странице — не более 10.
     """
-    url = reverse('news:home')
-    response = client.get(url)
+    response = client.get(urls_news_home)
     object_list = response.context['object_list']
     news_count = len(object_list)
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE

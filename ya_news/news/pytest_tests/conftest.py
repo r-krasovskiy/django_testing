@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.urls import reverse
 
 from yanews import settings
 from news.models import News, Comment
@@ -8,12 +9,13 @@ from news.models import News, Comment
 
 @pytest.fixture
 def author(django_user_model):
-    """фикстура автора новости."""
+    """Фикстура автора новости."""
     return django_user_model.objects.create(username='Автор')
+
 
 @pytest.fixture
 def author_client(author, client):
-    """фикстура залогиненного автора новости."""
+    """Фикстура залогиненного автора новости."""
     client.force_login(author)
     return client
 
@@ -25,10 +27,10 @@ def reader(django_user_model):
 
 
 @pytest.fixture
-def reader_client(reader, client):
+def reader_client(reader, admin_client):
     """фикстура залогиненного читателя."""
-    client.force_login(reader)
-    return reader_client
+    admin_client.force_login(reader)
+    return admin_client
 
 
 @pytest.fixture
@@ -53,53 +55,35 @@ def comment(author, news):
 
 
 @pytest.fixture
-def all_news():
-    """Фикстура списка всех новостей в базе."""
-    today = datetime.today()
-    all_news = [
-        News(
-            title=f'Новость {index}',
-            text='Текст новости.',
-            date=today - timedelta(days=index)
-        )
-        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
-    ]
-    News.objects.bulk_create(all_news)
-    return all_news
+def urls_news_home():
+    return reverse('news:home')
 
 
 @pytest.fixture
-def all_comments(news, author):
-    """Фикстура списка всех комментариев в базе."""
-    for index in range(2):
-        comment = Comment.objects.create(
-            news=news,
-            author=author,
-            text=f'Текст комментария {index}',
-        )
-        comment.created = timezone.now() + timedelta(days=index)
-        comment.save()
+def urls_users_login():
+    return reverse('users:login')
 
 
 @pytest.fixture
-def id_for_args(comment):
-    """Фикстура с id комментариев"""
-    return comment.id,
+def urls_users_logout():
+    return reverse('users:logout')
 
 
 @pytest.fixture
-def updated_comment(author, news):
-    """Фикстура редактирования комментария к новости."""
-    comment = Comment.objects.create(
-        news=news,
-        text='Скорректированный текст комментария',
-        author=author,
-    )
-    return comment
+def urls_users_signup():
+    return reverse('users:signup')
 
 
 @pytest.fixture
-def form_data():
-    return {
-        'text': 'Новый текст',
-    } 
+def urls_news_detail(news):
+    return reverse('news:detail', args=(news.id,))
+
+
+@pytest.fixture
+def urls_news_edit(news):
+    return reverse('news:edit', args=(news.id,))
+
+
+@pytest.fixture
+def urls_news_delete(comment):
+    return reverse('news:delete', args=(comment.id,))
