@@ -2,7 +2,6 @@ import pytest
 from http import HTTPStatus
 
 from pytest_django.asserts import assertRedirects
-from django.urls import reverse
 
 
 @pytest.mark.parametrize(
@@ -49,7 +48,9 @@ def test_detail_availability_for_anonymous_user(client, urls_news_detail):
     )
 )
 @pytest.mark.django_db
-def test_pages_availability_for_different_users(parametrized_client, url, comment, expected_status):
+def test_pages_availability_for_different_users(
+    parametrized_client, url, comment, expected_status
+):
     """Тест, пункты 3, 5:
     - страницы удаления и редактирования комментария доступны
     автору комментария;
