@@ -58,7 +58,7 @@ class TestRoutes(TestCase):
         )
 
         for url in urls:
-            with self.subTest():
+            with self.subTest(url=url):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -73,7 +73,7 @@ class TestRoutes(TestCase):
             self.URLS_NOTES_SUCCESS,
             self.URLS_NOTES_ADD)
         for url in urls:
-            with self.subTest():
+            with self.subTest(url=url):
                 response = self.auth_reader.get(url)
                 self.assertEquals(response.status_code, HTTPStatus.OK)
 
@@ -94,7 +94,7 @@ class TestRoutes(TestCase):
         )
         for user, result in users_availability:
             for url in urls:
-                with self.subTest():
+                with self.subTest(url=url):
                     response = user.get(url)
                     self.assertEqual(response.status_code, result)
 
@@ -113,7 +113,7 @@ class TestRoutes(TestCase):
             self.URLS_NOTES_DELETE,
         )
         for url in urls:
-            with self.subTest():
+            with self.subTest(url=url):
                 expected_url = f'{self.URLS_USERS_LOGIN}?next={url}'
                 response = self.client.get(url)
                 self.assertRedirects(response, expected_url)

@@ -1,9 +1,9 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, get_user
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from notes.models import Note
 from notes.forms import NoteForm
+from notes.models import Note
 
 User = get_user_model()
 
@@ -44,7 +44,7 @@ class TestContent(TestCase):
             (self.auth_reader, False),
         )
         for user, result in users_availability:
-            with self.subTest(user=user, result=result):
+            with self.subTest(user=get_user(user), result=result):
                 response = user.get(reverse('notes:list'))
                 object_context = response.context['object_list']
                 self.assertIs((self.note in object_context), result)

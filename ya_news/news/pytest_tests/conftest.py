@@ -1,9 +1,11 @@
-import pytest
-from datetime import timedelta
-from django.utils import timezone
-from django.urls import reverse
+from datetime import datetime, timedelta
 
-from yanews import settings
+from django.conf import settings
+from django.test import Client
+from django.urls import reverse
+from django.utils import timezone
+import pytest
+
 from news.models import News, Comment
 
 
@@ -14,8 +16,9 @@ def author(django_user_model):
 
 
 @pytest.fixture
-def author_client(author, client):
+def author_client(author):
     """Фикстура залогиненного автора новости (первого юзера)."""
+    client = Client()
     client.force_login(author)
     return client
 
@@ -57,8 +60,13 @@ def comment(author, news):
 @pytest.fixture
 def all_news():
     """Фикстура для проверки числа новостей наnews:home."""
+    today = datetime.today()
     all_news = [
-        News(title=f'Новость {index}', text='Просто текст.')
+        News(
+            title=f'Новость {index}',
+            text='Просто текст.',
+            date=today - timedelta(days=index)
+        )
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     ]
     News.objects.bulk_create(all_news)
