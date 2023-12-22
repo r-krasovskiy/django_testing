@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user, get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -94,7 +94,7 @@ class TestRoutes(TestCase):
         )
         for user, result in users_availability:
             for url in urls:
-                with self.subTest(url=url):
+                with self.subTest(url=url, result=result, user=get_user(user)):
                     response = user.get(url)
                     self.assertEqual(response.status_code, result)
 

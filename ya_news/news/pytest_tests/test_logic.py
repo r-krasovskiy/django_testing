@@ -1,8 +1,8 @@
-from http import HTTPStatus
 import random
+from http import HTTPStatus
 
 import pytest
-from pytest_django.asserts import assertRedirects, assertFormError
+from pytest_django.asserts import assertFormError, assertRedirects
 
 from news.forms import BAD_WORDS, WARNING
 from news.models import Comment
@@ -19,7 +19,9 @@ def test_anonymous_user_cant_create_comment(client, urls_news_detail):
     assert Comment.objects.count() == comments_before
 
 
-def test_user_can_create_comment(author_client, urls_news_detail):
+def test_user_can_create_comment(
+        author_client, urls_news_detail, news, author
+):
     """Тест, пункт 2: авторизованный пользователь
     может отправить комментарий.
     """
@@ -31,6 +33,8 @@ def test_user_can_create_comment(author_client, urls_news_detail):
     assert Comment.objects.count() == comments_before + 1
     comment_new = Comment.objects.get()
     assert comment_new.text == COMMENT_TEXT_UPD
+    assert comment_new.news == news
+    assert comment_new.author == author
 
 
 def test_user_cant_use_bad_words(author_client, urls_news_detail):

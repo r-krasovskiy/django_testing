@@ -137,6 +137,7 @@ class TestNoteCreation(TestCase):
         self.assertEqual(self.note.text, existent_note.text)
         self.assertEqual(self.note.title, existent_note.title)
         self.assertEqual(self.note.slug, existent_note.slug)
+        self.assertEqual(self.note.author_id, existent_note.author_id)
 
     def test_user_cant_delete_comment_of_another_user(self):
         """Тест, пункт 4.4: Пользователь не может удалять чужие заметки."""

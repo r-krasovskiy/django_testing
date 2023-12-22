@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 
+import pytest
 from django.conf import settings
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
-import pytest
 
-from news.models import News, Comment
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -30,8 +30,9 @@ def reader(django_user_model):
 
 
 @pytest.fixture
-def reader_client(reader, admin_client):
+def reader_client(reader):
     """Фикстура залогиненного читателя (второго юзера)."""
+    admin_client = Client()
     admin_client.force_login(reader)
     return admin_client
 
